@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Details</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f3f4f6;
+      padding: 20px;
+    }
+
+    .details-container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #2563eb;
+      margin-bottom: 25px;
+      font-size: 28px;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .details-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #f9fafb;
+    }
+
+    .details-item i {
+      margin-right: 12px;
+      color: #2563eb;
+      font-size: 18px;
+    }
+
+    .details-label {
+      font-weight: 600;
+      color: #374151;
+      margin-right: 6px;
+    }
+
+    .details-value {
+      color: #1f2937;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 12px 24px;
+      background: #2563eb;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .back-btn:hover {
+      background: #1d4ed8;
+    }
+
+    @media (max-width: 600px) {
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="details-container">
+  <h2>Student Full Details</h2>
+
+  <div class="details-grid" id="studentDetails">
+    <!-- Dynamic content will load here -->
+  </div>
+
+  <a href="javascript:history.back()" class="back-btn"><i class="fa fa-arrow-left"></i> Back</a>
+</div>
+
+  <script>
+    const students = {
+    'CA001': {
+      regNo: 'CA001', fullName: 'Rohit Sharma', roomNo: '105', seater: '3', stayingFrom: '2023-06-01',
+      contact: '9876543210', emergencyContact: '9123456789', gender: 'Male', feesDue: '₹2000',
+      permanentAddress: '123 Main Street, Delhi', currentAddress: '456 Park Avenue, Delhi'
+    },
+    'CA002': {
+      regNo: 'CA002', fullName: 'Priya Mehra', roomNo: '108', seater: '2', stayingFrom: '2023-05-15',
+      contact: '9123456780', emergencyContact: '9001234567', gender: 'Female', feesDue: '₹0',
+      permanentAddress: '78 West End, Mumbai', currentAddress: '9 Green Road, Mumbai'
+    },
+    'CA003': {
+      regNo: 'CA003', fullName: 'Sumit Verma', roomNo: '110', seater: '1', stayingFrom: '2023-07-10',
+      contact: '9988776655', emergencyContact: '9876543211', gender: 'Male', feesDue: '₹500',
+      permanentAddress: '45 Lake View, Punjab', currentAddress: '22 Central Park, Punjab'
+    },
+    'CA004': {
+      regNo: 'CA004', fullName: 'Neha Kapoor', roomNo: '112', seater: '2', stayingFrom: '2023-01-20',
+      contact: '9011223344', emergencyContact: '9345678901', gender: 'Female', feesDue: '₹3000',
+      permanentAddress: '91 East Road, Bangalore', currentAddress: '12 Tech Park, Bangalore'
+    },
+    'CA005': {
+      regNo: 'CA005', fullName: 'Arjun Singh', roomNo: '115', seater: '3', stayingFrom: '2022-12-05',
+      contact: '9822334455', emergencyContact: '9543216780', gender: 'Male', feesDue: '₹0',
+      permanentAddress: '33 South Lane, Kolkata', currentAddress: '14 City Center, Kolkata'
+    }
+  };
+
+  // Extract regNo from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const regNo = urlParams.get('regNo');
+
+  const student = students[regNo];
+
+  // Function to display student details
+  function displayStudentDetails(data) {
+    const container = document.getElementById('studentDetails');
+    if (!data) {
+      container.innerHTML = '<p style="color: red; font-weight: bold;">Student data not found!</p>';
+      return;
+    }
+    const detailItems = [
+      { label: 'Registration Number', value: data.regNo, icon: 'fa-id-card' },
+      { label: 'Full Name', value: data.fullName, icon: 'fa-user' },
+      { label: 'Room No.', value: data.roomNo, icon: 'fa-door-open' },
+      { label: 'Seater', value: data.seater, icon: 'fa-bed' },
+      { label: 'Staying From', value: data.stayingFrom, icon: 'fa-calendar-days' },
+      { label: 'Contact', value: data.contact, icon: 'fa-phone' },
+      { label: 'Emergency Contact', value: data.emergencyContact, icon: 'fa-triangle-exclamation' },
+      { label: 'Gender', value: data.gender, icon: 'fa-venus-mars' },
+      { label: 'Fees Due', value: data.feesDue, icon: 'fa-indian-rupee-sign' },
+      { label: 'Permanent Address', value: data.permanentAddress, icon: 'fa-location-dot' },
+      { label: 'Current Address', value: data.currentAddress, icon: 'fa-location-arrow' }
+    ];
+
+    detailItems.forEach(item => {
+      const detailDiv = document.createElement('div');
+      detailDiv.className = 'details-item';
+      detailDiv.innerHTML = `<i class="fa ${item.icon}"></i> 
+        <span class="details-label">${item.label}:</span> 
+        <span class="details-value">${item.value}</span>`;
+      container.appendChild(detailDiv);
+    });
+  }
+
+  // Load details
+  displayStudentDetails(student);
+  </script>
+
+</body>
+</html>

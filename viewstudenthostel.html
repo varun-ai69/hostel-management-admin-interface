@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hotel Management Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- FontAwesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+      background: #f1f5f9;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background-color: #1e1e2f;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      font-size: 24px;
+      color: #fff;
+      font-weight: 600;
+      background-color: #1e1e2f;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      overflow-y: auto;
+      flex-grow: 1;
+      padding: 0 20px 20px 20px;
+      scrollbar-width: thin;
+      scrollbar-color: #1abc9c #1e1e2f;
+    }
+
+    .sidebar ul::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .sidebar ul::-webkit-scrollbar-track {
+      background: #1e1e2f;
+      border-radius: 10px;
+    }
+
+    .sidebar ul::-webkit-scrollbar-thumb {
+      background: #1abc9c;
+      border-radius: 10px;
+    }
+
+    .sidebar ul::-webkit-scrollbar-thumb:hover {
+      background: #16a085;
+    }
+
+    .sidebar ul li {
+      margin: 12px 0;
+    }
+
+    .sidebar ul li a {
+      color: #a0a0a0;
+      text-decoration: none;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar ul li a i {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+
+    .sidebar ul li a:hover {
+      background-color: #2a2a3f;
+      color: #fff;
+      transform: translateX(8px);
+    }
+
+    .sidebar ul li a.active {
+      background-color: #1abc9c;
+      color: #fff;
+    }
+
+    .feature-heading {
+      padding: 0 20px;
+      color: #d1d5db;
+      font-size: 14px;
+      text-transform: uppercase;
+      margin: 10px 0;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex-grow: 1;
+      padding: 30px;
+      overflow-y: auto;
+      margin-left: 280px;
+      transition: margin-left 0.3s ease;
+    }
+
+    .main-content h1 {
+      font-size: 32px;
+      color: #1e293b;
+    }
+
+    /* Scroll Main Content */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #3B82F6;
+      border-radius: 4px;
+    }
+
+    .sidebar ul li.feature-heading {
+  padding: 10px 15px;
+  color: #d1d5db;
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: default;
+}
+
+.topbar {
+      width: 100%;
+      
+  background-color: #252540; /* Dark navy for a sleek, modern look */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Smooth shadow effect */
+
+
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 500;
+    }
+
+    /* Menu Icon */
+    .menu-icon {
+  font-size: 24px;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s ease, margin-left 0.3s ease;
+  position: relative;
+  margin-left: 270px; /* Initially aligned with sidebar */
+}
+
+.sidebar.collapsed + .topbar .menu-icon {
+  margin-left: 20px; /* Move left when sidebar is collapsed */
+}
+
+    .menu-icon:hover {
+      transform: scale(1.1);
+    }
+
+    /* Profile Section */
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .admin-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .admin-role {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .profile-photo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      object-fit: cover;
+    }
+
+    /* Dropdown Menu Styles */
+    .dropdown-menu {
+      display: none; /* Hidden by default */
+      position: absolute;
+      top: 60px; /* Adjust based on topbar height */
+      right: 20px;
+      background-color: #2a2a3f; /* Dark blue-gray */
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      width: 250px;
+      z-index: 1000;
+    }
+
+    .dropdown-menu .dropdown-item {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #a0a0a0; /* Light gray */
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .dropdown-menu .dropdown-item:hover {
+      background-color: #1e1e2f; /* Slightly darker blue-gray */
+      color: #fff;
+    }
+
+    .dropdown-menu .dropdown-item i {
+      font-size: 16px;  
+      width: 20px;
+      text-align: center;
+    }
+
+    .dropdown-menu .dropdown-item span {
+      font-size: 14px;
+    }
+
+    /* Show Dropdown on Click */   
+    .dropdown-menu.active {
+      display: block;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 280px;
+      padding: 20px;
+      margin-top: 70px; /* Adjust based on topbar height */
+      transition: margin-left 0.3s ease;
+    }
+
+   
+
+    .main-content.expanded {
+      margin-left: 0; /* Adjust when sidebar is collapsed */
+    }
+    .sidebar-header {
+  padding: 20px;
+  font-size: 22px;
+  font-weight: 600;
+  position: relative;
+}
+
+.sidebar-header::after {
+  content: '';
+  display: block;
+  width: 70%; /* Adjust width as per your need */
+  height: 1.5px; /* Thickness of the line */
+  background:  #a0a0a0; /* Color of the line */
+  margin-top: 20px;
+  margin-left: 25px;
+  border-radius: 10px; /* Rounded edges */
+}
+.student-management-container {
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.student-management-container h1 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1000px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+thead {
+  background: #3b82f6;
+  color: white;
+}
+
+thead th {
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+}
+
+tbody td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd;
+  color: #333;
+}
+
+tbody tr:hover {
+  background: #f0f9ff;
+}
+
+.view-btn, .delete-btn {
+  border: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  margin-right: 5px;
+  transition: all 0.2s ease-in-out;
+}
+
+.view-btn {
+  background: #3b82f6;
+}
+
+.view-btn:hover {
+  background: #2563eb;
+}
+
+.delete-btn {
+  background: #ef4444;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}
+
+/* For responsive */
+@media screen and (max-width: 768px) {
+  table {
+    font-size: 12px;
+  }
+  thead th, tbody td {
+    padding: 10px;
+  }
+}
+
+
+  </style>
+</head>
+
+<body>
+
+  <!-- Sidebar Start -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      Hostel Management
+    </div>
+
+    <ul>
+        <li>
+          <a href="hostel.html" >
+            <i class="fa-solid fa-house-chimney"></i>
+            Hostel Dashboard
+          </a>
+        </li>
+        <li class="feature-heading">
+          FEATURES
+        </li>
+        <li>
+          <a href="registerstudenthostel.html" >
+            <i class="fa-solid fa-user-plus" ></i>
+            Register Student
+          </a>
+        </li>
+        <li>
+          <a href="viewstudenthostel.html" class="active">
+            <i class="fa-solid fa-address-card"></i>
+            View Student Details
+          </a>
+        </li>
+        <li>
+          <a href="bookhostel.html">
+            <i class="fa-solid fa-bed"></i>
+            Book Hostel
+          </a>
+        </li>
+        <!-- <li>
+          <a href="hostelstudents.html">
+            <i class="fa-solid fa-users-line"></i>
+            Hostel Students
+          </a>
+        </li> -->
+        <li>
+          <a href="manageroom.html">
+            <i class="fa-solid fa-door-open"></i>
+            Manage Room
+          </a>
+        </li>
+        <li>
+          <a href="pendindrequest.html" >
+            <i class="fa-solid fa-hourglass-half" ></i>
+           Pending Requests
+          </a>
+        </li>
+      </ul>
+      
+  </div>
+  <div class="topbar">
+    <div class="menu-icon" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </div>
+    <div class="profile" onclick="toggleDropdown()">
+      <div class="profile-info">
+        <span class="admin-name">Varun</span>
+        <span class="admin-role">Super Admin</span>
+      </div>
+      <img src="/img/man_7122861.png" alt="Profile Photo" class="profile-photo">
+      <!-- Dropdown Menu -->
+      <div class="dropdown-menu" id="dropdownMenu">
+        <div class="dropdown-item">
+          <i class="fas fa-user"></i>
+          <span>Username: Varun</span>
+        </div>
+        <div class="dropdown-item">
+          <i class="fas fa-envelope"></i>
+          <span>Email: kushwahavarun86@gmail.com</span>
+        </div>
+        <div class="dropdown-item">
+          <i class="fas fa-key"></i>
+          <span>Change Password</span>
+        </div>
+        <div class="dropdown-item">
+          <i class="fas fa-lock"></i>
+          <span>Privacy</span>
+        </div>
+        <div class="dropdown-item">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </div>
+        <div class="dropdown-item">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  
+    <div class="main-content">
+      <div class="student-management-container">
+        <h1><i class="fa-solid fa-users" style="margin-right: 10px; color: #3b82f6; "></i>Hostel Student Management</h1>
+        <div style="margin-bottom: 15px; text-align: right; display: inline-block; ">
+          <input type="text" id="searchInput" placeholder="Search by Reg. No." 
+                 style="padding: 8px 12px; width: 250px; border: 1px solid #ccc; border-radius: 6px;">
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Reg. No.</th>
+                <th>Student's Name</th>
+                <th>Room No.</th>
+                <th>Seater</th>
+                <th>Staying From</th>
+                <th>Contact</th>
+                <th>Fees Due</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>CA001</td>
+                <td>Rohit Sharma</td>
+                <td>105</td>
+                <td>3</td>
+                <td>2023-06-01</td>
+                <td>9876543210</td>
+                <td>₹2000</td>
+                <td>
+                  <button class="view-btn" onclick="viewDetails('CA001')"><i class="fa-solid fa-eye"></i></button>
+                  <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>CA002</td>
+                <td>Priya Mehra</td>
+                <td>108</td>
+                <td>2</td>
+                <td>2023-05-15</td>
+                <td>9123456780</td>
+                <td>₹0</td>
+                <td>
+                  <button class="view-btn" onclick="viewDetails('CA002')"><i class="fa-solid fa-eye"></i></button>
+                  <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>CA003</td>
+                <td>Sumit Verma</td>
+                <td>110</td>
+                <td>1</td>
+                <td>2023-07-10</td>
+                <td>9988776655</td>
+                <td>₹500</td>
+                <td>
+                  <button class="view-btn" onclick="viewDetails('CA003')"><i class="fa-solid fa-eye"></i></button>
+                  <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>CA004</td>
+                <td>Neha Kapoor</td>
+                <td>112</td>
+                <td>2</td>
+                <td>2023-01-20</td>
+                <td>9011223344</td>
+                <td>₹3000</td>
+                <td>
+                  <button class="view-btn" onclick="viewDetails('CA004')"><i class="fa-solid fa-eye"></i></button>
+                  <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>CA005</td>
+                <td>Arjun Singh</td>
+                <td>115</td>
+                <td>3</td>
+                <td>2022-12-05</td>
+                <td>9822334455</td>
+                <td>₹0</td>
+                <td>
+                  <button class="view-btn" onclick="viewDetails('CA005')"><i class="fa-solid fa-eye"></i></button>
+                  <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      
+    </div>
+    
+  
+ <script>
+     // Toggle Sidebar
+    // function toggleSidebar() {
+    //   const sidebar = document.querySelector(".sidebar");
+    //   const mainContent = document.querySelector(".main-content");
+    //   sidebar.classList.toggle("collapsed");
+    //   mainContent.classList.toggle("expanded");
+    // }
+
+    // Toggle Dropdown
+    function toggleDropdown() {
+      const dropdownMenu = document.getElementById("dropdownMenu");
+      dropdownMenu.classList.toggle("active");
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", function (event) {
+      const dropdownMenu = document.getElementById("dropdownMenu");
+      const profile = document.querySelector(".profile");
+      if (!profile.contains(event.target)) {
+        dropdownMenu.classList.remove("active");
+      }
+    });
+   
+
+  // View details function (for consistency with existing buttons)
+  function viewDetails(regNo) {
+    window.location.href = `student-details-redirect.html?regNo=${regNo}`;
+  }
+  document.getElementById('searchInput').addEventListener('keyup', function() {
+    const filter = this.value.toUpperCase();
+    const table = document.getElementById('studentTableBody');
+    const rows = table.getElementsByTagName('tr');
+
+    for (let i = 0; i < rows.length; i++) {
+      const regNoCell = rows[i].getElementsByTagName('td')[1]; // 2nd column is Reg. No.
+      if (regNoCell) {
+        const regNoText = regNoCell.textContent || regNoCell.innerText;
+        if (regNoText.toUpperCase().indexOf(filter) > -1) {
+          rows[i].style.display = '';
+        } else {
+          rows[i].style.display = 'none';
+        }
+      }
+    }
+  });
+
+ </script>
+</body>
+
+</html>

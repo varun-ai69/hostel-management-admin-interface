@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hotel Management Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- FontAwesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+      background: #f1f5f9;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background-color: #1e1e2f;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      font-size: 24px;
+      color: #fff;
+      font-weight: 600;
+      background-color: #1e1e2f;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      overflow-y: auto;
+      flex-grow: 1;
+      padding: 0 20px 20px 20px;
+      scrollbar-width: thin;
+      scrollbar-color: #1abc9c #1e1e2f;
+    }
+
+    .sidebar ul::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .sidebar ul::-webkit-scrollbar-track {
+      background: #1e1e2f;
+      border-radius: 10px;
+    }
+
+    .sidebar ul::-webkit-scrollbar-thumb {
+      background: #1abc9c;
+      border-radius: 10px;
+    }
+
+    .sidebar ul::-webkit-scrollbar-thumb:hover {
+      background: #16a085;
+    }
+
+    .sidebar ul li {
+      margin: 12px 0;
+    }
+
+    .sidebar ul li a {
+      color: #a0a0a0;
+      text-decoration: none;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar ul li a i {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+
+    .sidebar ul li a:hover {
+      background-color: #2a2a3f;
+      color: #fff;
+      transform: translateX(8px);
+    }
+
+    .sidebar ul li a.active {
+      background-color: #1abc9c;
+      color: #fff;
+    }
+
+    .feature-heading {
+      padding: 0 20px;
+      color: #d1d5db;
+      font-size: 14px;
+      text-transform: uppercase;
+      margin: 10px 0;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex-grow: 1;
+      padding: 30px;
+      overflow-y: auto;
+      margin-left: 280px;
+      transition: margin-left 0.3s ease;
+    }
+
+    .main-content h1 {
+      font-size: 32px;
+      color: #1e293b;
+    }
+
+    /* Scroll Main Content */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #3B82F6;
+      border-radius: 4px;
+    }
+
+    .sidebar ul li.feature-heading {
+      padding: 10px 15px;
+      color: #d1d5db;
+      font-size: 14px;
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: default;
+    }
+
+    .topbar {
+      width: 100%;
+
+      background-color: #252540;
+      /* Dark navy for a sleek, modern look */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      /* Smooth shadow effect */
+
+
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 500;
+    }
+
+    /* Menu Icon */
+    .menu-icon {
+      font-size: 24px;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.3s ease, margin-left 0.3s ease;
+      position: relative;
+      margin-left: 270px;
+      /* Initially aligned with sidebar */
+    }
+
+    .sidebar.collapsed+.topbar .menu-icon {
+      margin-left: 20px;
+      /* Move left when sidebar is collapsed */
+    }
+
+    .menu-icon:hover {
+      transform: scale(1.1);
+    }
+
+    /* Profile Section */
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .admin-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .admin-role {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .profile-photo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      object-fit: cover;
+    }
+
+    /* Dropdown Menu Styles */
+    .dropdown-menu {
+      display: none;
+      /* Hidden by default */
+      position: absolute;
+      top: 60px;
+      /* Adjust based on topbar height */
+      right: 20px;
+      background-color: #2a2a3f;
+      /* Dark blue-gray */
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      width: 250px;
+      z-index: 1000;
+    }
+
+    .dropdown-menu .dropdown-item {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #a0a0a0;
+      /* Light gray */
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .dropdown-menu .dropdown-item:hover {
+      background-color: #1e1e2f;
+      /* Slightly darker blue-gray */
+      color: #fff;
+    }
+
+    .dropdown-menu .dropdown-item i {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .dropdown-menu .dropdown-item span {
+      font-size: 14px;
+    }
+
+    /* Show Dropdown on Click */
+    .dropdown-menu.active {
+      display: block;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 280px;
+      padding: 20px;
+      margin-top: 70px;
+      /* Adjust based on topbar height */
+      transition: margin-left 0.3s ease;
+    }
+
+
+
+    .main-content.expanded {
+      margin-left: 0;
+      /* Adjust when sidebar is collapsed */
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      font-size: 22px;
+      font-weight: 600;
+      position: relative;
+    }
+
+    .sidebar-header::after {
+      content: '';
+      display: block;
+      width: 70%;
+      /* Adjust width as per your need */
+      height: 1.5px;
+      /* Thickness of the line */
+      background: #a0a0a0;
+      /* Color of the line */
+      margin-top: 20px;
+      margin-left: 25px;
+      border-radius: 10px;
+      /* Rounded edges */
+    }
+
+    /* Main content padding */
+    .main-content {
+      padding: 20px;
+      background: #f5f7fa;
+      
+    }
+
+    /* Dashboard card layout */
+    .dashboard-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    /* Individual Card Styling */
+    .card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Icon Box */
+    .icon-box {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      margin-right: 15px;
+      font-size: 28px;
+    }
+
+    /* Colors */
+    .bg-blue {
+      background: #3b82f6;
+    }
+
+    .bg-yellow {
+      background: #fbbf24;
+    }
+
+    .bg-red {
+      background: #ef4444;
+    }
+
+    .bg-purple {
+      background: #8b5cf6;
+    }
+
+    /* Card Content */
+    .card-content h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #333;
+    }
+
+    .card-content p {
+      margin: 5px 0 0;
+      color: #666;
+      font-size: 14px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .icon-box {
+        margin-bottom: 10px;
+        margin-right: 0;
+      }
+    }
+
+    .recent-activity {
+      margin-top: 30px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .recent-activity h2 {
+      margin-bottom: 15px;
+      font-size: 20px;
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background: #f4f4f4;
+    }
+
+    .complaints-section {
+      margin-top: 30px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .complaint-item {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+    }
+
+    .complaint-header {
+      display: flex;
+      justify-content: space-between;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .status {
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    .pending {
+      background: red;
+      color: white;
+    }
+
+    .complaint-details {
+      display: none;
+      padding-top: 10px;
+      color: #555;
+    }
+
+    /* Table improvements */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background: #f4f4f4;
+      color: #333;
+    }
+
+    /* Complaint section improvements */
+    .complaint-item {
+      border-bottom: 1px solid #ddd;
+      padding: 15px 0;
+    }
+
+    .complaint-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .complaint-details {
+      display: none;
+      padding-top: 10px;
+      color: #555;
+    }
+
+    .action-btn {
+      padding: 5px 12px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .action-btn:hover {
+      background: #2563eb;
+    }
+  /* Feature Cards Hover Effect */
+.card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+}
+/* Table Row Hover Effect */
+table tbody tr {
+  transition: background 0.3s ease;
+}
+
+table tbody tr:hover {
+  background: #f0f4f8;
+  cursor: pointer;
+}
+
+  </style>
+</head>
+
+<body>
+
+  <!-- Sidebar Start -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      Hostel Management
+    </div>
+
+    <ul>
+      <li>
+        <a href="hostel.html" class="active">
+          <i class="fa-solid fa-house-chimney"></i>
+          Hostel Dashboard
+        </a>
+      </li>
+      <li class="feature-heading">
+        FEATURES
+      </li>
+      <li>
+        <a href="registerstudenthostel.html">
+          <i class="fa-solid fa-user-plus"></i>
+          Register Student
+        </a>
+      </li>
+      <li>
+        <a href="viewstudenthostel.html">
+          <i class="fa-solid fa-address-card"></i>
+          View Student Details
+        </a>
+      </li>
+      <li>
+        <a href="bookhostel.html">
+          <i class="fa-solid fa-bed"></i>
+          Book Hostel
+        </a>
+      </li>
+      <!-- <li>
+        <a href="hostelstudents.html">
+          <i class="fa-solid fa-users-line"></i>
+          Hostel Students
+        </a>
+      </li> -->
+      <li>
+        <a href="manageroom.html">
+          <i class="fa-solid fa-door-open"></i>
+          Manage Room
+        </a>
+      </li>
+      <li>
+        <a href="pendindrequest.html" >
+          <i class="fa-solid fa-hourglass-half" ></i>
+         Pending Requests
+        </a>
+      </li>
+    </ul>
+
+  </div>
+  <div class="topbar">
+    <div class="menu-icon" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </div>
+    <div class="profile" onclick="toggleDropdown()">
+      <div class="profile-info">
+        <span class="admin-name">Varun</span>
+        <span class="admin-role">Super Admin</span>
+      </div>
+      <img src="/img/man_7122861.png" alt="Profile Photo" class="profile-photo">
+      <!-- Dropdown Menu -->
+      <div class="dropdown-menu" id="dropdownMenu">
+        <div class="dropdown-item">
+          <i class="fas fa-user"></i>
+          <span>Username: Varun</span>
+        </div>
+        <div class="dropdown-item">
+          <i class="fas fa-envelope"></i>
+          <span>Email: kushwahavarun86@gmail.com</span>
+        </div>
+        <div class="dropdown-item">
+          <i class="fas fa-key"></i>
+          <span>Change Password</span>
+        </div>
+        <div class="dropdown-item">
+          <i class="fas fa-lock"></i>
+          <span>Privacy</span>
+        </div>
+        <div class="dropdown-item">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </div>
+        <div class="dropdown-item">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="main-content">
+    <div class="dashboard-cards">
+
+      <!-- Available Rooms -->
+      <div class="card">
+        <div class="icon-box bg-blue">
+          <i class="fas fa-door-open"></i>
+        </div>
+        <div class="card-content">
+          <h3>Available Rooms</h3>
+          <p id="availableRooms">12 Rooms</p>
+        </div>
+      </div>
+
+      <!-- Pending Student Requests -->
+      <div class="card">
+        <div class="icon-box bg-yellow">
+          <i class="fas fa-user-clock"></i>
+        </div>
+        <div class="card-content">
+          <h3>Pending Requests</h3>
+          <p id="pendingRequests">4 Requests</p>
+        </div>
+      </div>
+
+      <!-- Occupied Rooms -->
+      <div class="card">
+        <div class="icon-box bg-red">
+          <i class="fas fa-bed"></i>
+        </div>
+        <div class="card-content">
+          <h3>Occupied Rooms</h3>
+          <p id="occupiedRooms">18 Rooms</p>
+        </div>
+      </div>
+
+      <!-- Student Complaints -->
+      <div class="card">
+        <div class="icon-box bg-purple">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="card-content">
+          <h3>Student Complaints</h3>
+          <p id="studentComplaints">4 Complaints</p>
+        </div>
+      </div>
+
+    </div>
+    <!-- Recent Student Activity Section -->
+    <div class="recent-activity">
+      <h2>Recent Student Activity</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Room</th>
+            <th>Activity</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Rahul Sharma</td>
+            <td>202</td>
+            <td>Checked In</td>
+            <td>10:30 AM</td>
+          </tr>
+          <tr>
+            <td>Priya Verma</td>
+            <td>305</td>
+            <td>Submitted Complaint</td>
+            <td>11:00 AM</td>
+          </tr>
+          <tr>
+            <td>Arjun Mehta</td>
+            <td>110</td>
+            <td>Checked Out</td>
+            <td>11:30 AM</td>
+          </tr>
+          <tr>
+            <td>Simran Kaur</td>
+            <td>410</td>
+            <td>Checked In</td>
+            <td>12:00 PM</td>
+          </tr>
+          <tr>
+            <td>Aman Gupta</td>
+            <td>215</td>
+            <td>Submitted Complaint</td>
+            <td>12:30 PM</td>
+          </tr>
+          <tr>
+            <td>Neha Singh</td>
+            <td>308</td>
+            <td>Checked Out</td>
+            <td>1:00 PM</td>
+          </tr>
+          <tr>
+            <td>Mohit Chauhan</td>
+            <td>101</td>
+            <td>Checked In</td>
+            <td>1:30 PM</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Recent Complaints Section -->
+    <div class="complaints-section">
+      <h2>Recent Complaints</h2>
+
+      <!-- Complaint 1 -->
+      <div class="complaint-item">
+        <div class="complaint-header" onclick="toggleComplaint(1)">
+          <span>⚠️ Noise Issue - Room 305</span>
+          <button class="action-btn" onclick="event.stopPropagation(); takeAction(1)">Take Action</button>
+        </div>
+        <div class="complaint-details" id="complaint-1">
+          <p><strong>Student:</strong> Priya Verma</p>
+          <p><strong>Details:</strong> Loud music being played at night.</p>
+          <p><strong>Date:</strong> 11 March 2025</p>
+        </div>
+      </div>
+
+      <!-- Complaint 2 -->
+      <div class="complaint-item">
+        <div class="complaint-header" onclick="toggleComplaint(2)">
+          <span>⚠️ Cleanliness Issue - Room 215</span>
+          <button class="action-btn" onclick="event.stopPropagation(); takeAction(2)">Take Action</button>
+        </div>
+        <div class="complaint-details" id="complaint-2">
+          <p><strong>Student:</strong> Aman Gupta</p>
+          <p><strong>Details:</strong> Dirty bathroom not cleaned for days.</p>
+          <p><strong>Date:</strong> 11 March 2025</p>
+        </div>
+      </div>
+
+      <!-- Complaint 3 -->
+      <div class="complaint-item">
+        <div class="complaint-header" onclick="toggleComplaint(3)">
+          <span>⚠️ Harassment Report - Room 110</span>
+          <button class="action-btn" onclick="event.stopPropagation(); takeAction(3)">Take Action</button>
+        </div>
+        <div class="complaint-details" id="complaint-3">
+          <p><strong>Student:</strong> Arjun Mehta</p>
+          <p><strong>Details:</strong> Being bullied by roommate.</p>
+          <p><strong>Date:</strong> 10 March 2025</p>
+        </div>
+      </div>
+
+      <!-- Complaint 4 -->
+      <div class="complaint-item">
+        <div class="complaint-header" onclick="toggleComplaint(4)">
+          <span>⚠️ Water Leakage - Room 410</span>
+          <button class="action-btn" onclick="event.stopPropagation(); takeAction(4)">Take Action</button>
+        </div>
+        <div class="complaint-details" id="complaint-4">
+          <p><strong>Student:</strong> Simran Kaur</p>
+          <p><strong>Details:</strong> Water leaking from ceiling.</p>
+          <p><strong>Date:</strong> 10 March 2025</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Toggle Sidebar
+    // function toggleSidebar() {
+    //   const sidebar = document.querySelector(".sidebar");
+    //   const mainContent = document.querySelector(".main-content");
+    //   sidebar.classList.toggle("collapsed");
+    //   mainContent.classList.toggle("expanded");
+    // }
+
+    // Toggle Dropdown
+    function toggleDropdown() {
+      const dropdownMenu = document.getElementById("dropdownMenu");
+      dropdownMenu.classList.toggle("active");
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", function (event) {
+      const dropdownMenu = document.getElementById("dropdownMenu");
+      const profile = document.querySelector(".profile");
+      if (!profile.contains(event.target)) {
+        dropdownMenu.classList.remove("active");
+      }
+    });
+    // Toggle complaint detail visibility
+    function toggleComplaint(id) {
+      let details = document.getElementById(`complaint-${id}`);
+      details.style.display = details.style.display === "block" ? "none" : "block";
+    }
+
+    // Placeholder for Take Action button (customize logic later)
+    function takeAction(id) {
+      alert('Taking action on Complaint ID: ' + id);
+      // You can add a modal popup or redirect to action form here
+    }
+
+  </script>
+</body>
+
+</html>

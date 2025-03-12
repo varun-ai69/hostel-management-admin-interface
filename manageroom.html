@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hotel Management Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- FontAwesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+      background: #f1f5f9;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background-color: #1e1e2f;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      font-size: 24px;
+      color: #fff;
+      font-weight: 600;
+      background-color: #1e1e2f;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      overflow-y: auto;
+      flex-grow: 1;
+      padding: 0 20px 20px 20px;
+      scrollbar-width: thin;
+      scrollbar-color: #1abc9c #1e1e2f;
+    }
+
+    .sidebar ul::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .sidebar ul::-webkit-scrollbar-track {
+      background: #1e1e2f;
+      border-radius: 10px;
+    }
+
+    .sidebar ul::-webkit-scrollbar-thumb {
+      background: #1abc9c;
+      border-radius: 10px;
+    }
+
+    .sidebar ul::-webkit-scrollbar-thumb:hover {
+      background: #16a085;
+    }
+
+    .sidebar ul li {
+      margin: 12px 0;
+    }
+
+    .sidebar ul li a {
+      color: #a0a0a0;
+      text-decoration: none;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar ul li a i {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+
+    .sidebar ul li a:hover {
+      background-color: #2a2a3f;
+      color: #fff;
+      transform: translateX(8px);
+    }
+
+    .sidebar ul li a.active {
+      background-color: #1abc9c;
+      color: #fff;
+    }
+
+    .feature-heading {
+      padding: 0 20px;
+      color: #d1d5db;
+      font-size: 14px;
+      text-transform: uppercase;
+      margin: 10px 0;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex-grow: 1;
+      padding: 30px;
+      overflow-y: auto;
+      margin-left: 280px;
+      transition: margin-left 0.3s ease;
+    }
+
+    .main-content h1 {
+      font-size: 32px;
+      color: #1e293b;
+    }
+
+    /* Scroll Main Content */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #3B82F6;
+      border-radius: 4px;
+    }
+
+    .sidebar ul li.feature-heading {
+  padding: 10px 15px;
+  color: #d1d5db;
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: default;
+}
+
+.topbar {
+      width: 100%;
+      
+  background-color: #252540; /* Dark navy for a sleek, modern look */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Smooth shadow effect */
+
+
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 500;
+    }
+
+    /* Menu Icon */
+    .menu-icon {
+  font-size: 24px;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s ease, margin-left 0.3s ease;
+  position: relative;
+  margin-left: 270px; /* Initially aligned with sidebar */
+}
+
+.sidebar.collapsed + .topbar .menu-icon {
+  margin-left: 20px; /* Move left when sidebar is collapsed */
+}
+
+    .menu-icon:hover {
+      transform: scale(1.1);
+    }
+
+    /* Profile Section */
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .admin-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .admin-role {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .profile-photo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      object-fit: cover;
+    }
+
+    /* Dropdown Menu Styles */
+    .dropdown-menu {
+      display: none; /* Hidden by default */
+      position: absolute;
+      top: 60px; /* Adjust based on topbar height */
+      right: 20px;
+      background-color: #2a2a3f; /* Dark blue-gray */
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      width: 250px;
+      z-index: 1000;
+    }
+
+    .dropdown-menu .dropdown-item {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #a0a0a0; /* Light gray */
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .dropdown-menu .dropdown-item:hover {
+      background-color: #1e1e2f; /* Slightly darker blue-gray */
+      color: #fff;
+    }
+
+    .dropdown-menu .dropdown-item i {
+      font-size: 16px;  
+      width: 20px;
+      text-align: center;
+    }
+
+    .dropdown-menu .dropdown-item span {
+      font-size: 14px;
+    }
+
+    /* Show Dropdown on Click */   
+    .dropdown-menu.active {
+      display: block;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 280px;
+      padding: 20px;
+      margin-top: 70px; /* Adjust based on topbar height */
+      transition: margin-left 0.3s ease;
+    }
+
+   
+
+    .main-content.expanded {
+      margin-left: 0; /* Adjust when sidebar is collapsed */
+    }
+    .sidebar-header {
+  padding: 20px;
+  font-size: 22px;
+  font-weight: 600;
+  position: relative;
+}
+
+.sidebar-header::after {
+  content: '';
+  display: block;
+  width: 70%; /* Adjust width as per your need */
+  height: 1.5px; /* Thickness of the line */
+  background:  #a0a0a0; /* Color of the line */
+  margin-top: 20px;
+  margin-left: 25px;
+  border-radius: 10px; /* Rounded edges */
+}
+
+
+body {
+      background: #f1f5f9;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1000px;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background: #3b82f6;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background: #f9fafb;
+    }
+
+    tr:hover {
+      background: #eef2f7;
+    }
+
+    .add-btn {
+      background: #3b82f6;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .add-btn:hover {
+      background: #2563eb;
+    }
+
+    .action-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 0 5px;
+    }
+
+    .action-btn.view {
+      color: #2563eb;
+    }
+
+    .action-btn.delete {
+      color: #dc2626;
+    }
+
+    /* Modal Styling */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 400px;
+      position: relative;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-content h2 {
+      margin-bottom: 20px;
+    }
+
+    .modal-content input, .modal-content select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .modal-content button {
+      width: 48%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .modal-content .insert-btn {
+      background: #22c55e;
+      color: white;
+    }
+
+    .modal-content .reset-btn {
+      background: #ef4444;
+      color: white;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      cursor: pointer;
+      color: #888;
+    }
+
+    .close-btn:hover {
+      color: #000;
+    }
+
+
+  </style>
+</head>
+
+<body>
+
+  <!-- Sidebar Start -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      Hostel Management
+    </div>
+
+    <ul>
+        <li>
+          <a href="hostel.html" >
+            <i class="fa-solid fa-house-chimney"></i>
+            Hostel Dashboard
+          </a>
+        </li>
+        <li class="feature-heading">
+          FEATURES
+        </li>
+        <li>
+          <a href="registerstudenthostel.html" >
+            <i class="fa-solid fa-user-plus" ></i>
+            Register Student
+          </a>
+        </li>
+        <li>
+          <a href="viewstudenthostel.html">
+            <i class="fa-solid fa-address-card"></i>
+            View Student Details
+          </a>
+        </li>
+        <li>
+          <a href="bookhostel.html">
+            <i class="fa-solid fa-bed"></i>
+            Book Hostel
+          </a>
+        </li>
+        
+        <li>
+          <a href="manageroom.html" class="active">
+            <i class="fa-solid fa-door-open"></i>
+            Manage Room
+          </a>
+        </li>
+        <li>
+          <a href="pendindrequest.html" >
+            <i class="fa-solid fa-hourglass-half" ></i>
+           Pending Requests
+          </a>
+        </li>
+      </ul>
+      
+  </div>
+  <div class="topbar">
+    <div class="menu-icon" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </div>
+    <div class="profile" onclick="toggleDropdown()">
+      <div class="profile-info">
+        <span class="admin-name">Varun</span>
+        <span class="admin-role">Super Admin</span>
+      </div>
+      <img src="/img/man_7122861.png" alt="Profile Photo" class="profile-photo">
+      <!-- Dropdown Menu -->
+      <div class="dropdown-menu" id="dropdownMenu">
+        <div class="dropdown-item">
+          <i class="fas fa-user"></i>
+          <span>Username: Varun</span>
+        </div>
+        <div class="dropdown-item">
+          <i class="fas fa-envelope"></i>
+          <span>Email: kushwahavarun86@gmail.com</span>
+        </div>
+        <div class="dropdown-item">
+          <i class="fas fa-key"></i>
+          <span>Change Password</span>
+        </div>
+        <div class="dropdown-item">
+          <i class="fas fa-lock"></i>
+          <span>Privacy</span>
+        </div>
+        <div class="dropdown-item">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </div>
+        <div class="dropdown-item">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="main-content">
+    <div class="container">
+      <h1><i class="fa-solid fa-bed" style="margin-right: 10px; color: #3b82f6;"></i>Hostel Room Management</h1>
+      <button class="add-btn" onclick="toggleModal()">+ Add Room</button>
+  
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Room No.</th>
+              <th>Seater</th>
+              <th>Fees/Month</th>
+              <th>Occupied</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="room-table-body" >
+  
+            <!-- Sample Data -->
+            <tr><td>1</td><td>101</td><td>3</td><td>₹3000</td><td>Yes</td><td><button class="action-btn view"><i class="fa-solid fa-eye"></i></button><button class="action-btn delete"><i class="fa-solid fa-trash"></i></button></td></tr>
+            <tr><td>2</td><td>102</td><td>2</td><td>₹2500</td><td>No</td><td><button class="action-btn view"><i class="fa-solid fa-eye"></i></button><button class="action-btn delete"><i class="fa-solid fa-trash"></i></button></td></tr>
+            <tr><td>3</td><td>103</td><td>1</td><td>₹2000</td><td>Yes</td><td><button class="action-btn view"><i class="fa-solid fa-eye"></i></button><button class="action-btn delete"><i class="fa-solid fa-trash"></i></button></td></tr>
+            <tr><td>4</td><td>104</td><td>4</td><td>₹4000</td><td>No</td><td><button class="action-btn view"><i class="fa-solid fa-eye"></i></button><button class="action-btn delete"><i class="fa-solid fa-trash"></i></button></td></tr>
+            <tr><td>5</td><td>105</td><td>3</td><td>₹3500</td><td>Yes</td><td><button class="action-btn view"><i class="fa-solid fa-eye"></i></button><button class="action-btn delete"><i class="fa-solid fa-trash"></i></button></td></tr>
+            <tr><td>6</td><td>106</td><td>2</td><td>₹2800</td><td>No</td><td><button class="action-btn view"><i class="fa-solid fa-eye"></i></button><button class="action-btn delete"><i class="fa-solid fa-trash"></i></button></td></tr>
+            <tr><td>7</td><td>107</td><td>1</td><td>₹2200</td><td>Yes</td><td><button class="action-btn view"><i class="fa-solid fa-eye"></i></button><button class="action-btn delete"><i class="fa-solid fa-trash"></i></button></td></tr>
+            <tr><td>8</td><td>108</td><td>4</td><td>₹4500</td><td>No</td><td><button class="action-btn view"><i class="fa-solid fa-eye"></i></button><button class="action-btn delete"><i class="fa-solid fa-trash"></i></button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+    <!-- Add Room Modal -->
+    <div class="modal" id="roomModal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="toggleModal()">&times;</span>
+        <h2>Add Room Details</h2>
+        <input type="number" id="roomNumber" placeholder="Room Number">
+        <select id="seater">
+          <option value="" >Select Seater</option>
+          <option value="1">1 Seater</option>
+          <option value="2">2 Seater</option>
+          <option value="3">3 Seater</option>
+          <option value="4">4 Seater</option>
+        </select>
+        
+        <!-- Total Fees Input -->
+        <input type="number" id="fees" placeholder="Total Fees">
+        
+        <!-- Occupied Status Dropdown -->
+        <select id="occupied">
+          <option value="">Occupied?</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+        <div style="display: flex; justify-content: space-between;">
+          <button class="insert-btn" onclick="addRoom()">Insert</button>
+
+          <button class="reset-btn">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+ <script>
+     // Toggle Sidebar
+    // function toggleSidebar() {
+    //   const sidebar = document.querySelector(".sidebar");
+    //   const mainContent = document.querySelector(".main-content");
+    //   sidebar.classList.toggle("collapsed");
+    //   mainContent.classList.toggle("expanded");
+    // }
+
+    // Toggle Dropdown
+    function toggleDropdown() {
+      const dropdownMenu = document.getElementById("dropdownMenu");
+      dropdownMenu.classList.toggle("active");
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", function (event) {
+      const dropdownMenu = document.getElementById("dropdownMenu");
+      const profile = document.querySelector(".profile");
+      if (!profile.contains(event.target)) {
+        dropdownMenu.classList.remove("active");
+      }
+    });
+    function toggleModal() {
+      var modal = document.getElementById('roomModal');
+      if (modal.style.display === "flex") {
+        modal.style.display = "none";
+      } else {
+        modal.style.display = "flex";
+      }
+    }
+
+    function resetForm() {
+      var inputs = document.querySelectorAll('.modal-content input, .modal-content select');
+      inputs.forEach(function(input) {
+        input.value = '';
+      });
+    }
+
+    function addRoom() {
+  const roomNumber = document.getElementById('roomNumber').value;
+  const seater = document.getElementById('seater').value;
+  const fees = document.getElementById('fees').value;
+  const occupied = document.getElementById('occupied').value;
+
+  if (!roomNumber || !seater || !fees || !occupied) {
+    alert("Please fill all fields!");
+    return;
+  }
+
+  const tableBody = document.getElementById('room-table-body');
+  const rowCount = tableBody.rows.length + 1;
+
+  const newRow = document.createElement('tr');
+  newRow.innerHTML = `
+    <td>${rowCount}</td>
+    <td>${roomNumber}</td>
+    <td>${seater}</td>
+    <td>₹${fees}</td>
+    <td>${occupied}</td>
+    <td>
+      <button class="action-btn view"><i class="fa-solid fa-eye"></i></button>
+      <button class="action-btn delete" onclick="this.closest('tr').remove()"><i class="fa-solid fa-trash"></i></button>
+    </td>
+  `;
+  tableBody.appendChild(newRow);
+
+  // Reset form fields after adding
+  document.getElementById('roomNumber').value = '';
+  document.getElementById('seater').value = '';
+  document.getElementById('fees').value = '';
+  document.getElementById('occupied').value = '';
+}
+
+ </script>
+</body>
+
+</html>
